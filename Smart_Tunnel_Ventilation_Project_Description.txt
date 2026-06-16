@@ -1,0 +1,108 @@
+Smart Tunnel Ventilation and Safety Monitoring System
+
+PROJECT OVERVIEW
+The Smart Tunnel Ventilation and Safety Monitoring System is an IoT-based solution designed to improve safety inside road tunnels by continuously monitoring environmental conditions and automatically controlling ventilation systems.
+
+The system uses multiple sensors to detect hazardous conditions such as:
+- Smoke accumulation
+- Presence of alcohol/gas vapors
+- High temperature levels
+- Humidity monitoring
+
+Based on real-time sensor readings, the system automatically activates an exhaust fan through a relay module to maintain safe air quality and environmental conditions within the tunnel.
+
+OBJECTIVES
+- Monitor tunnel environmental conditions in real time.
+- Detect smoke and harmful gases.
+- Measure temperature and humidity levels.
+- Automatically control ventilation fans when unsafe conditions are detected.
+- Provide live monitoring through MQTT communication and OLED display.
+- Improve tunnel safety using low-cost IoT hardware.
+
+HARDWARE COMPONENTS
+
+NodeMCU ESP8266 (Controller 1)
+- DHT11 Temperature and Humidity Sensor
+- MQ2 Smoke Sensor
+- Relay Module
+- Exhaust/Ventilation Fan
+
+NodeMCU ESP8266 (Controller 2)
+- MQ3 Alcohol/Gas Sensor
+- OLED Display (SSD1306)
+
+SENSORS USED
+
+MQ2 Smoke Sensor
+- Detects smoke, LPG, methane, and combustible gases.
+- Used to identify smoke buildup and fire-related hazards.
+
+MQ3 Gas/Alcohol Sensor
+- Detects alcohol vapors and ethanol-based gases.
+- Used to monitor harmful gas concentrations.
+
+DHT11 Temperature and Humidity Sensor
+- Measures ambient temperature and relative humidity.
+- Used to detect overheating conditions and monitor environmental comfort levels.
+
+COMMUNICATION ARCHITECTURE
+
+The project uses MQTT protocol for wireless communication between two NodeMCU devices.
+
+MQTT Topics:
+- tunnel/sensors
+- tunnel/alcohol
+- tunnel/alerts
+
+SYSTEM WORKFLOW
+
+1. NodeMCU #1 reads temperature, humidity, and smoke levels.
+2. Sensor data is converted into JSON format and published through MQTT.
+3. NodeMCU #2 receives environmental data, reads MQ3 sensor values, displays information on OLED, and publishes alcohol readings.
+4. NodeMCU #1 evaluates all sensor values.
+5. Ventilation fan is activated if:
+   - Temperature > 35°C
+   - Smoke level > 600
+   - Alcohol level > 700
+6. Alert messages are generated when dangerous conditions are detected.
+
+AUTOMATIC VENTILATION LOGIC
+
+- Temperature > 35°C  -> Fan ON
+- Smoke Level > 600   -> Fan ON
+- Alcohol Level > 700 -> Fan ON
+- Normal Conditions   -> Fan OFF
+
+SOFTWARE TECHNOLOGIES
+- Arduino IDE
+- ESP8266 WiFi Library
+- PubSubClient (MQTT)
+- ArduinoJson
+- DHT Sensor Library
+- Adafruit SSD1306 Library
+- Adafruit GFX Library
+
+KEY FEATURES
+- Real-time environmental monitoring
+- Wireless IoT communication using MQTT
+- Automatic ventilation control
+- OLED-based live status display
+- JSON data transmission
+- Hazard detection and alert generation
+- Low-cost and scalable architecture
+
+FUTURE ENHANCEMENTS
+- Cloud dashboard integration
+- Mobile application monitoring
+- SMS and Email alerts
+- AI-based predictive ventilation control
+- Multiple tunnel section monitoring
+- Integration with emergency response systems
+
+CONCLUSION
+The Smart Tunnel Ventilation and Safety Monitoring System demonstrates how IoT technology can enhance tunnel safety through continuous environmental monitoring and intelligent ventilation control. By combining MQ2, MQ3, and DHT11 sensors with ESP8266 microcontrollers and MQTT communication, the system provides a reliable, scalable, and cost-effective solution for detecting hazardous conditions and maintaining safe tunnel environments.
+
+Project Type: IoT / Embedded Systems
+Platform: ESP8266 NodeMCU
+Communication Protocol: MQTT
+Application Domain: Smart Transportation and Tunnel Safety
