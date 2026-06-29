@@ -1,19 +1,3 @@
-"""
-outlier_detection.py — Isolation Forest outlier removal for multi-sensor data.
-
-Why Isolation Forest?
-    1. Multi-variate: operates on all sensor channels simultaneously, capturing
-       cross-sensor anomalies (e.g., physically impossible temp + humidity combos).
-    2. No distribution assumption: unlike Z-score (Gaussian) or IQR (symmetric),
-       Isolation Forest works on any data shape.
-    3. Efficient: O(n log n) — much faster than LOF (O(n²)) for our dataset.
-    4. Single tuning knob: `contamination` sets the expected outlier fraction.
-
-Usage:
-    detector = OutlierDetector(contamination=0.05)
-    clean_df, report = detector.fit_remove(df)
-"""
-
 import os
 import joblib
 import pandas as pd
@@ -24,7 +8,6 @@ import config
 
 
 class OutlierDetector:
-    """Multivariate outlier detector using Isolation Forest on sensor columns."""
 
     def __init__(
         self,
@@ -41,25 +24,8 @@ class OutlierDetector:
         self.sensor_cols = config.SENSOR_COLUMNS
         self.is_fitted = False
 
-    # ------------------------------------------------------------------
-    # Core methods
-    # ------------------------------------------------------------------
     def fit_remove(self, df):
-        """
-        Fit the Isolation Forest on sensor columns and remove detected outliers.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            DataFrame containing at least the 4 sensor columns.
-
-        Returns
-        -------
-        clean_df : pd.DataFrame
-            DataFrame with outlier rows removed.
-        report : dict
-            Summary of outlier removal: counts per class, total removed, etc.
-        """
+       
         print("\n" + "=" * 50)
         print("OUTLIER DETECTION (Isolation Forest)")
         print("=" * 50)
@@ -124,15 +90,9 @@ class OutlierDetector:
 
         return clean_df, report
 
-    # ------------------------------------------------------------------
-    # Predict on new data (for real-data pipeline)
-    # ------------------------------------------------------------------
+    
     def predict(self, df):
-        """
-        Use the already-fitted model to flag outliers in new data.
-
-        Returns a boolean mask where True = outlier.
-        """
+       
         if not self.is_fitted:
             raise RuntimeError("Model not fitted. Call fit_remove() first.")
 

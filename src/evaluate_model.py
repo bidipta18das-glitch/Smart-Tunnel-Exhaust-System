@@ -1,24 +1,10 @@
-"""
-evaluate_model.py — Dual-model evaluation with metrics and visualizations.
-
-Evaluates both the AQI and fan-speed Random Forest models:
-    - Accuracy score
-    - Classification report (precision, recall, F1 per class)
-    - Confusion matrix (saved as side-by-side plot)
-    - Feature importance chart (7 fused features)
-    - Cross-validation summary
-
-Usage:
-    evaluator = EvaluateModel(data, model_dir, results_dir)
-    evaluator.evaluate_pipeline()
-"""
 
 import os
 import joblib
 import pandas as pd
 import numpy as np
 import matplotlib
-matplotlib.use("Agg")  # Non-interactive backend for headless environments
+matplotlib.use("Agg")  
 import matplotlib.pyplot as plt
 from sklearn.metrics import (
     precision_score,
@@ -51,18 +37,12 @@ class EvaluateModel:
         self.y_fan_pred = None
         self.metrics = {}
 
-    # ------------------------------------------------------------------
-    # Load models
-    # ------------------------------------------------------------------
     def load_models(self):
-        """Load both models from disk."""
         try:
             aqi_path = os.path.join(self.model_dir, "aqi_model.pkl")
             fan_path = os.path.join(self.model_dir, "fan_speed_model.pkl")
-
             self.aqi_model = joblib.load(aqi_path)
             self.fan_model = joblib.load(fan_path)
-
             print("Models loaded successfully:")
             print(f"  AQI model:  {aqi_path}")
             print(f"  Fan model:  {fan_path}\n")
@@ -71,9 +51,7 @@ class EvaluateModel:
             print(f"Error loading models: {e}")
             return False
 
-    # ------------------------------------------------------------------
-    # Predict
-    # ------------------------------------------------------------------
+    
     def predict(self):
         """Generate predictions for the test set."""
         self.y_aqi_pred = self.aqi_model.predict(self.X_test)
@@ -81,9 +59,7 @@ class EvaluateModel:
         print(f"Predictions generated for {len(self.X_test)} test samples.\n")
         return True
 
-    # ------------------------------------------------------------------
-    # Calculate metrics
-    # ------------------------------------------------------------------
+
     def calculate_metrics(self):
     
         self.metrics["aqi_accuracy"] = accuracy_score(
@@ -183,9 +159,6 @@ class EvaluateModel:
         print(self.metrics["fan_report"])
         print("=" * 60 + "\n")
 
-    # ------------------------------------------------------------------
-    # Plots
-    # ------------------------------------------------------------------
     def save_confusion_matrices(self):
         """Save side-by-side confusion matrices for both models."""
         os.makedirs(self.results_dir, exist_ok=True)
@@ -256,9 +229,7 @@ class EvaluateModel:
         aqi_imp.to_csv(csv_path, index=False)
         print(f"[OK] Feature importance CSV saved: {csv_path}")
 
-    # ------------------------------------------------------------------
-    # Save reports
-    # ------------------------------------------------------------------
+   
     def save_reports(self):
         """Save classification reports as text files."""
         os.makedirs(self.results_dir, exist_ok=True)
@@ -283,9 +254,6 @@ class EvaluateModel:
 
         os.makedirs(self.results_dir, exist_ok=True)
 
-        # =====================================================
-        # Metrics JSON
-        # =====================================================
         metrics = {
             "aqi_model": {
                 "accuracy": float(self.metrics["aqi_accuracy"]),
@@ -307,9 +275,7 @@ class EvaluateModel:
         ) as f:
             json.dump(metrics, f, indent=4)
 
-        # =====================================================
-        # Save Class Labels
-        # =====================================================
+    
         with open(
             os.path.join(self.results_dir, "aqi_class_labels.json"),
             "w"
@@ -330,9 +296,7 @@ class EvaluateModel:
                 indent=4
             )
 
-        # =====================================================
-        # AQI Confusion Matrix CSV
-        # =====================================================
+    
         aqi_cm_df = pd.DataFrame(
             self.metrics["aqi_cm"],
             index=self.aqi_model.classes_,
@@ -346,9 +310,7 @@ class EvaluateModel:
             )
         )
 
-        # =====================================================
-        # Fan Confusion Matrix CSV
-        # =====================================================
+     
         fan_cm_df = pd.DataFrame(
             self.metrics["fan_cm"],
             index=self.fan_model.classes_,
@@ -362,9 +324,6 @@ class EvaluateModel:
             )
         )
 
-        # =====================================================
-        # AQI Confusion Matrix JSON
-        # =====================================================
         aqi_cm_json = {
             "labels": [str(x) for x in self.aqi_model.classes_],
             "matrix": self.metrics["aqi_cm"].tolist()
@@ -379,9 +338,6 @@ class EvaluateModel:
         ) as f:
             json.dump(aqi_cm_json, f, indent=4)
 
-        # =====================================================
-        # Fan Confusion Matrix JSON
-        # =====================================================
         fan_cm_json = {
             "labels": [int(x) for x in self.fan_model.classes_],
             "matrix": self.metrics["fan_cm"].tolist()
@@ -463,9 +419,72 @@ class EvaluateModel:
         )
 
         print("[OK] Dashboard data exported")
-    # ------------------------------------------------------------------
-    # Full pipeline
-    # ------------------------------------------------------------------
+        print(f"[OK] Metrics saved to: {self.results_dir}/metrics.json")
+        print(f"[OK] AQI confusion matrix saved")
+        print(f"[OK] Fan confusion matrix saved")
+
+        os.makedirs(self.results_dir, exist_ok=True)
+            # Metrics
+        metrics = {
+            "aqi_model": {
+                "accuracy": float(self.metrics["aqi_accuracy"]),
+                "precision": float(self.metrics["aqi_precision"]),
+                "recall": float(self.metrics["aqi_recall"]),
+                "f1_score": float(self.metrics["aqi_f1"])
+            },
+            "fan_model": {
+                "accuracy": float(self.metrics["fan_accuracy"]),
+                "precision": float(self.metrics["fan_precision"]),
+                "recall": float(self.metrics["fan_recall"]),
+                "f1_score": float(self.metrics["fan_f1"])
+            }
+        }
+        with open(
+            os.path.join(self.results_dir, "aqi_class_labels.json"),
+            "w"
+        ) as f:
+            json.dump(
+                [str(x) for x in self.aqi_model.classes_],
+                f,
+                indent=4
+            )
+
+        with open(
+            os.path.join(self.results_dir, "fan_class_labels.json"),
+            "w"
+        ) as f:
+            json.dump(
+                [int(x) for x in self.fan_model.classes_],
+                f,
+                indent=4
+            )
+        aqi_cm_df = pd.DataFrame(
+            self.metrics["aqi_cm"],
+            index=self.aqi_model.classes_,
+            columns=self.aqi_model.classes_
+        )
+
+        aqi_cm_df.to_csv(
+            os.path.join(
+                self.results_dir,
+                "aqi_confusion_matrix.csv"
+            )
+        )
+        # Fan Confusion Matrix
+        fan_cm_df = pd.DataFrame(
+            self.metrics["fan_cm"],
+            index=self.fan_model.classes_,
+            columns=self.fan_model.classes_
+        )
+        fan_cm_df.to_csv(
+            os.path.join(
+                self.results_dir,
+                "fan_confusion_matrix.csv"
+            )
+        )
+
+        print("[OK] Dashboard data exported")
+   
     def evaluate_pipeline(self):
         """Run the full evaluation pipeline."""
         print("\n" + "=" * 60)
@@ -485,10 +504,6 @@ class EvaluateModel:
         self.save_dashboard_data()
 
 
-
-# ======================================================================
-# Standalone entry point
-# ======================================================================
 if __name__ == "__main__":
     from sensor_fusion import SensorFusion
     from sklearn.model_selection import train_test_split

@@ -1,18 +1,3 @@
-"""
-train_model.py — Dual-target Random Forest training pipeline.
-
-Trains two separate Random Forest classifiers:
-    1. AQI model  → predicts Future_AQI_Class (Normal / Increased / Chemical / Hazardous)
-    2. Fan model   → predicts Fan_Speed_Percent (30 / 60 / 80 / 100)
-
-Both models operate on the 7 fused features (4 raw + 3 engineered).
-Includes stratified train/test split and 5-fold cross-validation.
-
-Usage:
-    trainer = TrainModel(data, model_dir=config.SYNTH_MODEL_DIR)
-    trainer.train_pipeline()
-"""
-
 import os
 import joblib
 import pandas as pd
@@ -20,22 +5,11 @@ import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-
 import config
-
-
 class TrainModel:
-    """Train dual Random Forest models for AQI classification + fan speed."""
 
     def __init__(self, data, model_dir=config.SYNTH_MODEL_DIR):
-        """
-        Parameters
-        ----------
-        data : pd.DataFrame
-            Must contain FUSED_FEATURES + TARGET_AQI + TARGET_FAN columns.
-        model_dir : str
-            Directory to save trained models and metadata.
-        """
+       
         self.data = data
         self.model_dir = model_dir
 
@@ -62,7 +36,7 @@ class TrainModel:
     # Prepare data
     # ------------------------------------------------------------------
     def prepare_data(self):
-        """Extract features and targets from the DataFrame."""
+        
         print("Preparing features and targets...")
 
         self.X = self.data[config.FUSED_FEATURES]

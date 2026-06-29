@@ -1,22 +1,7 @@
-"""
-preprocessing.py — Data loading, quality checks, and basic cleaning.
-
-Handles: missing values, duplicates, physical sensor-limit validation.
-This module runs BEFORE outlier detection (which is a separate stage).
-
-Usage:
-    preprocessor = Preprocessing(input_path, output_path)
-    clean_df = preprocessor.preprocess()
-"""
-
 import os
 import pandas as pd
-
-
 import config
-
 class Preprocessing:
-    """Load, inspect, and clean raw sensor data."""
 
     def __init__(self, input_path, output_path=None):
         self.input_path = input_path
@@ -28,7 +13,6 @@ class Preprocessing:
     # Loading
     # ------------------------------------------------------------------
     def load_data(self):
-        """Load CSV into a DataFrame."""
         try:
             self.data = pd.read_csv(self.input_path)
             print(f"Data loaded successfully. Shape: {self.data.shape}")
@@ -38,9 +22,6 @@ class Preprocessing:
             print(f"Error loading data: {e}")
             return None
 
-    # ------------------------------------------------------------------
-    # Quality checks
-    # ------------------------------------------------------------------
     def check_data_quality(self):
         """Print a quality report: missing values, duplicates, dtypes."""
         print("Data Quality Report:")
@@ -59,10 +40,7 @@ class Preprocessing:
         print(f"Data types:\n{self.data.dtypes}\n")
 
     def validate_sensor_ranges(self):
-        """
-        Flag rows where sensor values fall outside physical hardware limits.
-        DHT11: Temp 0–50 °C, Humidity 20–100 %.  MQ-series: 0–1023 ADC.
-        """
+       
         print("Sensor Range Validation:")
         print("-" * 50)
 
@@ -95,9 +73,6 @@ class Preprocessing:
             print("\n  All sensor readings are within physical limits.")
         print()
 
-    # ------------------------------------------------------------------
-    # Cleaning steps
-    # ------------------------------------------------------------------
     def remove_missing_values(self):
         """Drop rows containing any NaN."""
         initial_shape = self.cleaned_data.shape
@@ -116,9 +91,7 @@ class Preprocessing:
         print(f"Removed {removed} duplicate rows")
         print(f"New shape: {self.cleaned_data.shape}\n")
 
-    # ------------------------------------------------------------------
-    # Save
-    # ------------------------------------------------------------------
+   
     def save_cleaned_data(self):
         """Save the cleaned DataFrame to CSV."""
         if self.output_path is None:
@@ -135,15 +108,12 @@ class Preprocessing:
             print(f"Error saving data: {e}")
             return False
 
-    # ------------------------------------------------------------------
-    # Summary statistics
-    # ------------------------------------------------------------------
+   
     def get_statistics(self):
         """Return per-column descriptive statistics."""
         return self.cleaned_data[config.SENSOR_COLUMNS].describe()
 
     def get_summary(self):
-        """Print a preprocessing summary."""
         print("Preprocessing Summary:")
         print("=" * 50)
         print(f"Input file:  {self.input_path}")
@@ -152,15 +122,8 @@ class Preprocessing:
         print(f"Final shape: {self.cleaned_data.shape}")
         print("=" * 50 + "\n")
 
-    # ------------------------------------------------------------------
-    # Full pipeline
-    # ------------------------------------------------------------------
     def preprocess(self):
-        """
-        Run the full preprocessing pipeline:
-        load → quality check → remove NaN → remove duplicates →
-        validate sensor ranges → save.
-        """
+        
         print("\n" + "=" * 50)
         print("STARTING DATA PREPROCESSING PIPELINE")
         print("=" * 50 + "\n")
@@ -175,7 +138,6 @@ class Preprocessing:
         self.remove_duplicates()
         self.validate_sensor_ranges()
 
-        # Print class distribution if target column exists
         if config.TARGET_AQI in self.cleaned_data.columns:
             print("Class Distribution:")
             print(self.cleaned_data[config.TARGET_AQI].value_counts())
@@ -186,10 +148,6 @@ class Preprocessing:
 
         return self.cleaned_data
 
-
-# ======================================================================
-# Standalone entry point
-# ======================================================================
 def main():
     preprocessor = Preprocessing(config.RAW_CSV, config.CLEANED_CSV)
     cleaned_data = preprocessor.preprocess()

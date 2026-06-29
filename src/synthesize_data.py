@@ -1,9 +1,3 @@
-"""
-synthesize_data.py — Synthesize a large dataset for training the Tunnel Exhaust System ML models.
-
-Generates at least 40,000 rows (targeted at 50,000 raw rows to account for duplicate and outlier removal)
-conforming to the engineering threshold rules defined in config.py.
-"""
 
 import os
 import sys
